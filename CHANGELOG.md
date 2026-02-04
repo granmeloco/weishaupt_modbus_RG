@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - **RG-Version branding**: Integration renamed to "Weishaupt WBB (RG-Version)" to differentiate from original
 
 ### Changed
+- **Domain changed to `weishaupt_modbus_rg`**: Now a completely separate integration that can coexist with original
 - Temperature controls now available as both number entities (existing) and climate entities (new)
 - Users can choose between number sliders or thermostat cards for temperature control
 - Added @granmeloco to codeowners
