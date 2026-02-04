@@ -1,5 +1,5 @@
 {
-  "domain": "weishaupt_modbus",
+  "domain": "weishaupt_modbus_rg",
   "name": "Weishaupt WBB (RG-Version)",
   "codeowners": [
     "@OStrama, @MadOne, @granmeloco"
