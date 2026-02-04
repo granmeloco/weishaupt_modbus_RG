@@ -11,10 +11,12 @@ All notable changes to this project will be documented in this file.
   - HVAC modes (Auto, Heat, Off)
   - Works with all standard and custom thermostat cards
   - Integrates with existing modbus temperature controls
+- **RG-Version branding**: Integration renamed to "Weishaupt WBB (RG-Version)" to differentiate from original
 
 ### Changed
 - Temperature controls now available as both number entities (existing) and climate entities (new)
 - Users can choose between number sliders or thermostat cards for temperature control
+- Added @granmeloco to codeowners
 
 ---
 

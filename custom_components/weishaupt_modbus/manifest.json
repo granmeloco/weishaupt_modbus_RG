@@ -1,8 +1,8 @@
 {
   "domain": "weishaupt_modbus",
-  "name": "Weishaupt WBB",
+  "name": "Weishaupt WBB (RG-Version)",
   "codeowners": [
-    "@OStrama, @MadOne"
+    "@OStrama, @MadOne, @granmeloco"
   ],
   "config_flow": true,
   "documentation": "https://github.com/OStrama/weishaupt_modbus/",

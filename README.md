@@ -1,10 +1,11 @@
-# Weishaupt Modbus Integration for Home Assistant
+# Weishaupt Modbus Integration for Home Assistant (RG-Version)
 
 > **Note**: This is a fork of [OStrama/weishaupt_modbus](https://github.com/OStrama/weishaupt_modbus) with additional features and enhancements.
 
-## What's New in This Fork
+## What's New in This RG-Version
 
 - **Climate Platform**: Added native Home Assistant thermostat entities for heating circuits
+- Enhanced integration name to differentiate from original version
 - See [CHANGELOG.md](CHANGELOG.md) for detailed version history
 
 ---
