@@ -67,6 +67,23 @@
         }
     },
     "entity": {
+        "climate": {
+            "climate_hk1": {
+                "name": "{prefix}Heizkreis 1"
+            },
+            "climate_hk2": {
+                "name": "{prefix}Heizkreis 2"
+            },
+            "climate_hk3": {
+                "name": "{prefix}Heizkreis 3"
+            },
+            "climate_hk4": {
+                "name": "{prefix}Heizkreis 4"
+            },
+            "climate_hk5": {
+                "name": "{prefix}Heizkreis 5"
+            }
+        },
         "number": {
             "bivalenztemp": {
                 "name": "{prefix}Bivalenztemperatur"

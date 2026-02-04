@@ -37,6 +37,7 @@ from .webif_object import WebifConnection
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[str] = [
+    "climate",
     "number",
     "select",
     "sensor",

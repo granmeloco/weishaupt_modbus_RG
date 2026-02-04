@@ -1,3 +1,22 @@
+# Weishaupt Modbus Integration for Home Assistant
+
+> **Note**: This is a fork of [OStrama/weishaupt_modbus](https://github.com/OStrama/weishaupt_modbus) with additional features and enhancements.
+
+## What's New in This Fork
+
+- **Climate Platform**: Added native Home Assistant thermostat entities for heating circuits
+- See [CHANGELOG.md](CHANGELOG.md) for detailed version history
+
+---
+
+## Version History
+
+# 1.1.0
+- **Added Climate Platform**: Native thermostat entities for all heating circuits (HK1-HK5)
+  - Works with all standard and custom thermostat cards
+  - Preset modes: Comfort, Normal, Eco
+  - HVAC modes: Auto, Heat, Off
+
 # 1.0.17
 - Adjusted mapping for 41102 Anforderung Typ
 - Add PV Mode
