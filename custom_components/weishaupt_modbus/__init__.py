@@ -245,7 +245,7 @@ def create_string_json() -> None:
 
     # load strings.json into string
     # replaced Path.open by open
-    with Path("config/custom_components/weishaupt_modbus_rg/strings.json").open(
+    with Path("config/custom_components/weishaupt-modbus-rg/strings.json").open(
         encoding="utf-8"
     ) as file:
         data = file.read()
@@ -255,7 +255,7 @@ def create_string_json() -> None:
     data_dict["entity"] = myEntity
     # write whole json to file again
     # replaced Path.open by open
-    with Path("config/custom_components/weishaupt_modbus_rg/strings.json").open(
+    with Path("config/custom_components/weishaupt_modbus/strings.json").open(
         mode="w",
         encoding="utf-8",
     ) as file:

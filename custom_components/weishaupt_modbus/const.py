@@ -40,7 +40,7 @@ CONF = ConfConstants()
 class MainConstants:
     """Main constants."""
 
-    DOMAIN: str = "weishaupt_modbus_rg"
+    DOMAIN: str = "weishaupt_modbus"
     SCAN_INTERVAL: timedelta = timedelta(seconds=30)
     UNIQUE_ID: str = "unique_id"
     APPID: int = 100
