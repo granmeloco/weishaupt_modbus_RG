@@ -2,6 +2,5 @@
   "name": "Weishaupt WBB (RG-Version)",
   "content_in_root": false,
   "filename": "weishaupt_modbus_rg",
-  "zip_release": false,
   "render_readme": true
 }
