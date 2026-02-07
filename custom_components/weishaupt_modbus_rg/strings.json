@@ -82,6 +82,9 @@
             },
             "climate_hk5": {
                 "name": "{prefix}Heizkreis 5"
+            },
+            "climate_ww": {
+                "name": "{prefix}Warmwasser"
             }
         },
         "number": {

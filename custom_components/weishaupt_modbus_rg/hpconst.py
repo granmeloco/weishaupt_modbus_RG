@@ -1359,9 +1359,9 @@ MODBUS_HZ_ITEMS = [
     ModbusItem( address=41102, name="Anforderung Typ", mformat=FORMATS.STATUS, mtype=TYPES.NUMBER_RO, device=DEVICES.HZ, resultlist=HZ_ANFORDERUNG, translation_key="anf_typ"),
     ModbusItem( address=41103, name="Betriebsart", mformat=FORMATS.STATUS, mtype=TYPES.SELECT, device=DEVICES.HZ, resultlist=HZ_BETRIEBSART, translation_key="hz_operationmode"),
     ModbusItem( address=41104, name="Pause / Party", mformat=FORMATS.STATUS, mtype=TYPES.SELECT, device=DEVICES.HZ, resultlist=HZ_PARTY_PAUSE, params = PARAMS_PARTY, translation_key="party_pause"),
-    ModbusItem( address=41105, name="Raumsolltemperatur Komfort", mformat=FORMATS.TEMPERATURE, mtype=TYPES.NUMBER, device=DEVICES.HZ, params=PARAMS_ROOMTEMP_HIGH, translation_key="raum_soll_temp_komf"),
-    ModbusItem( address=41106, name="Raumsolltemperatur Normal", mformat=FORMATS.TEMPERATURE, mtype=TYPES.NUMBER, device=DEVICES.HZ, params=PARAMS_ROOMTEMP_MID, translation_key="raum_soll_temp_normal"),
-    ModbusItem( address=41107, name="Raumsolltemperatur Absenk", mformat=FORMATS.TEMPERATURE, mtype=TYPES.NUMBER, device=DEVICES.HZ, params=PARAMS_ROOMTEMP_LOW, translation_key="raum_soll_temp_absenk"),
+    ModbusItem( address=41105, name="Raumsolltemperatur Komfort", mformat=FORMATS.TEMPERATURE, mtype=TYPES.NUMBER, device=DEVICES.HZ, params={**PARAMS_ROOMTEMP_HIGH, "hidden_by_default": True}, translation_key="raum_soll_temp_komf"),
+    ModbusItem( address=41106, name="Raumsolltemperatur Normal", mformat=FORMATS.TEMPERATURE, mtype=TYPES.NUMBER, device=DEVICES.HZ, params={**PARAMS_ROOMTEMP_MID, "hidden_by_default": True}, translation_key="raum_soll_temp_normal"),
+    ModbusItem( address=41107, name="Raumsolltemperatur Absenk", mformat=FORMATS.TEMPERATURE, mtype=TYPES.NUMBER, device=DEVICES.HZ, params={**PARAMS_ROOMTEMP_LOW, "hidden_by_default": True}, translation_key="raum_soll_temp_absenk"),
     ModbusItem( address=41108, name="Heizkennlinie", mformat=FORMATS.NUMBER, mtype=TYPES.NUMBER, device=DEVICES.HZ, params=PARAMS_HZKENNLINIE, translation_key="heizkennlinie"),
     ModbusItem( address=41109, name="Sommer Winter Umschaltung", mformat=FORMATS.TEMPERATURE, mtype=TYPES.NUMBER, device=DEVICES.HZ, params=PARAMS_SUMMER_WINTER_SWITCH_TEMP, translation_key="so_wi_umschalt"),
     ModbusItem( address=41110, name="Heizen Konstanttemperatur", mformat=FORMATS.TEMPERATURE, mtype=TYPES.NUMBER_RO, device=DEVICES.HZ, params=PARAMS_ROOMTEMP, translation_key="heiz_konstanttemp"),
@@ -1375,11 +1375,11 @@ MODBUS_HZ2_ITEMS: list = []
 for item in MODBUS_HZ_ITEMS:
     mbi2 = copy.deepcopy(x=item)
     if mbi2.address == 41105:
-        mbi2.params = PARAMS_ROOMTEMP_HIGH2
+        mbi2.params = {**PARAMS_ROOMTEMP_HIGH2, "hidden_by_default": True}
     if mbi2.address == 41106:
-        mbi2.params = PARAMS_ROOMTEMP_MID2
+        mbi2.params = {**PARAMS_ROOMTEMP_MID2, "hidden_by_default": True}
     if mbi2.address == 41107:
-        mbi2.params = PARAMS_ROOMTEMP_LOW2
+        mbi2.params = {**PARAMS_ROOMTEMP_LOW2, "hidden_by_default": True}
     mbi2.address = item.address+100
     mbi2.name = item.name + "2"
     mbi2.translation_key = item.translation_key + "2"
@@ -1392,11 +1392,11 @@ MODBUS_HZ3_ITEMS: list = []
 for item in MODBUS_HZ_ITEMS:
     mbi3 = copy.deepcopy(x=item)
     if mbi3.address == 41105:
-        mbi3.params = PARAMS_ROOMTEMP_HIGH3
+        mbi3.params = {**PARAMS_ROOMTEMP_HIGH3, "hidden_by_default": True}
     if mbi3.address == 41106:
-        mbi3.params = PARAMS_ROOMTEMP_MID3
+        mbi3.params = {**PARAMS_ROOMTEMP_MID3, "hidden_by_default": True}
     if mbi3.address == 41107:
-        mbi3.params = PARAMS_ROOMTEMP_LOW3
+        mbi3.params = {**PARAMS_ROOMTEMP_LOW3, "hidden_by_default": True}
     mbi3.address = item.address+200
     mbi3.name = item.name + "3"
     mbi3.translation_key = item.translation_key + "3"
@@ -1408,11 +1408,11 @@ MODBUS_HZ4_ITEMS: list = []
 for item in MODBUS_HZ_ITEMS:
     mbi4 = copy.deepcopy(x=item)
     if mbi4.address == 41105:
-        mbi4.params = PARAMS_ROOMTEMP_HIGH4
+        mbi4.params = {**PARAMS_ROOMTEMP_HIGH4, "hidden_by_default": True}
     if mbi4.address == 41106:
-        mbi4.params = PARAMS_ROOMTEMP_MID4
+        mbi4.params = {**PARAMS_ROOMTEMP_MID4, "hidden_by_default": True}
     if mbi4.address == 41107:
-        mbi4.params = PARAMS_ROOMTEMP_LOW4
+        mbi4.params = {**PARAMS_ROOMTEMP_LOW4, "hidden_by_default": True}
     mbi4.address = item.address+300
     mbi4.name = item.name + "4"
     mbi4.translation_key = item.translation_key + "4"
@@ -1424,11 +1424,11 @@ MODBUS_HZ5_ITEMS: list = []
 for item in MODBUS_HZ_ITEMS:
     mbi5: ModbusItem = copy.deepcopy(x=item)
     if mbi5.address == 41105:
-        mbi5.params = PARAMS_ROOMTEMP_HIGH5
+        mbi5.params = {**PARAMS_ROOMTEMP_HIGH5, "hidden_by_default": True}
     if mbi5.address == 41106:
-        mbi5.params = PARAMS_ROOMTEMP_MID5
+        mbi5.params = {**PARAMS_ROOMTEMP_MID5, "hidden_by_default": True}
     if mbi5.address == 41107:
-        mbi5.params = PARAMS_ROOMTEMP_LOW5
+        mbi5.params = {**PARAMS_ROOMTEMP_LOW5, "hidden_by_default": True}
     mbi5.address = item.address+400
     mbi5.name = item.name + "5"
     mbi5.translation_key = item.translation_key + "5"
@@ -1440,8 +1440,8 @@ MODBUS_WW_ITEMS: list[ModbusItem] = [
     ModbusItem( address=32102, name="Warmwassertemperatur", mformat=FORMATS.TEMPERATURE, mtype=TYPES.SENSOR, device=DEVICES.WW, params=PARAMS_WATERTEMP, translation_key="ww_temp"),
     ModbusItem( address=42101, name="WW_Konfiguration", mformat=FORMATS.STATUS, mtype=TYPES.NUMBER_RO, device=DEVICES.WW, resultlist=WW_KONFIGURATION, translation_key="ww_konf"),
     ModbusItem( address=42102, name="Warmwasser Push", mformat=FORMATS.STATUS, mtype=TYPES.SELECT, device=DEVICES.WW, resultlist=WW_PUSH, translation_key="ww_push"),
-    ModbusItem( address=42103, name="Warmwasser Normal", mformat=FORMATS.TEMPERATURE, mtype=TYPES.NUMBER, device=DEVICES.WW, params=PARAMS_WATERTEMP_HIGH, translation_key="ww_normal"),
-    ModbusItem( address=42104, name="Warmwasser Absenk", mformat=FORMATS.TEMPERATURE, mtype=TYPES.NUMBER, device=DEVICES.WW, params=PARAMS_WATERTEMP_LOW, translation_key="ww_absenk"),
+    ModbusItem( address=42103, name="Warmwasser Normal", mformat=FORMATS.TEMPERATURE, mtype=TYPES.NUMBER, device=DEVICES.WW, params={**PARAMS_WATERTEMP_HIGH, "hidden_by_default": True}, translation_key="ww_normal"),
+    ModbusItem( address=42104, name="Warmwasser Absenk", mformat=FORMATS.TEMPERATURE, mtype=TYPES.NUMBER, device=DEVICES.WW, params={**PARAMS_WATERTEMP_LOW, "hidden_by_default": True}, translation_key="ww_absenk"),
     ModbusItem( address=42105, name="SG Ready Anhebung", mformat=FORMATS.TEMPERATURE, mtype=TYPES.NUMBER, device=DEVICES.WW, params=PARAMS_SGREADYTEMP, translation_key="sgr_anhebung"),
 ]
 

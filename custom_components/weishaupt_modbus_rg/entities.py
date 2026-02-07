@@ -124,6 +124,11 @@ class MyEntity(Entity):
             icon = self._api_item.params.get("icon", None)
             if icon is not None:
                 self._attr_icon = icon
+            
+            # Hide entity by default if specified (e.g., when controlled by climate entity)
+            hidden_by_default = self._api_item.params.get("hidden_by_default", False)
+            if hidden_by_default:
+                self._attr_entity_registry_enabled_default = False
 
     def set_min_max(self, onlydynamic: bool = False):
         """Set min max to fixed or dynamic values."""

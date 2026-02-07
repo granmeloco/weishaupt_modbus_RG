@@ -24,22 +24,7 @@ from .modbusobject import ModbusAPI, ModbusObject
 
 _LOGGER = logging.getLogger(__name__)
 
-# Mapping between HA HVAC modes and Weishaupt operation modes
-HVAC_MODE_TO_WEISHAUPT = {
-    HVACMode.AUTO: 0,  # Automatik
-    HVACMode.HEAT: 2,  # Normal
-    HVACMode.OFF: 4,  # Standby
-}
-
-WEISHAUPT_TO_HVAC_MODE = {
-    0: HVACMode.AUTO,  # Automatik
-    1: HVACMode.HEAT,  # Komfort
-    2: HVACMode.HEAT,  # Normal
-    3: HVACMode.HEAT,  # Absenkbetrieb
-    4: HVACMode.OFF,  # Standby
-}
-
-# Preset modes for temperature setpoints
+# Preset modes for temperature setpoints control
 PRESET_COMFORT = "comfort"
 PRESET_NORMAL = "normal"
 PRESET_ECO = "eco"
@@ -52,7 +37,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up the climate platform."""
     coordinator = config_entry.runtime_data.coordinator
-    entries: list[WeishauptClimate] = []
+    entries: list[WeishauptClimate | WeishauptHotWaterClimate] = []
 
     # Get all modbus items for heating circuits
     modbus_items = coordinator.modbus_items
@@ -103,6 +88,19 @@ async def async_setup_entry(
                     )
                 )
 
+    # Create climate entity for hot water (Warmwasser)
+    ww_items = {
+        item.address: item for item in modbus_items if item.device == DEVICES.WW
+    }
+    if ww_items:
+        entries.append(
+            WeishauptHotWaterClimate(
+                config_entry=config_entry,
+                coordinator=coordinator,
+                ww_items=ww_items,
+            )
+        )
+
     async_add_entities(entries, update_before_add=True)
 
 
@@ -110,7 +108,7 @@ class WeishauptClimate(CoordinatorEntity, ClimateEntity, MyEntity):
     """Representation of a Weishaupt heating circuit as a climate entity."""
 
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
-    _attr_hvac_modes = [HVACMode.AUTO, HVACMode.HEAT, HVACMode.OFF]
+    _attr_hvac_modes = [HVACMode.HEAT]
     _attr_preset_modes = [PRESET_COMFORT, PRESET_NORMAL, PRESET_ECO]
     _attr_supported_features = (
         ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.PRESET_MODE
@@ -186,11 +184,11 @@ class WeishauptClimate(CoordinatorEntity, ClimateEntity, MyEntity):
 
     @property
     def hvac_mode(self) -> HVACMode:
-        """Return current HVAC mode."""
-        if self._mode_item and self._mode_item.state is not None:
-            return WEISHAUPT_TO_HVAC_MODE.get(
-                self._mode_item.state, HVACMode.HEAT
-            )
+        """Return current HVAC mode.
+        
+        Always returns HEAT. Use the separate 'Betriebsart' select entity
+        to control the operation mode (Automatik/Komfort/Normal/Absenkbetrieb/Standby).
+        """
         return HVACMode.HEAT
 
     @property
@@ -240,25 +238,152 @@ class WeishauptClimate(CoordinatorEntity, ClimateEntity, MyEntity):
         await self.coordinator.async_request_refresh()
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
-        """Set new HVAC mode."""
-        if self._mode_item is None:
-            _LOGGER.warning("Cannot set HVAC mode: mode item not found")
+        """Set new HVAC mode.
+        
+        Not supported - use the separate 'Betriebsart' (hz_operationmode) select entity
+        to control the operation mode instead.
+        """
+        _LOGGER.debug(
+            "HVAC mode changes not supported. Use the 'Betriebsart' select entity to control operation mode."
+        )
+
+    async def async_set_preset_mode(self, preset_mode: str) -> None:
+        """Set new preset mode.
+        
+        Preset modes control which temperature setpoint you're viewing/adjusting:
+        - Comfort: Adjusts 'Raumsolltemperatur Komfort' (41105)
+        - Normal: Adjusts 'Raumsolltemperatur Normal' (41106)
+        - Eco: Adjusts 'Raumsolltemperatur Absenk' (41107)
+        
+        The actual operation mode is controlled separately via the 'Betriebsart' select entity.
+        """
+        if preset_mode not in self._attr_preset_modes:
+            _LOGGER.warning("Unknown preset mode: %s", preset_mode)
             return
 
-        modbus_value = HVAC_MODE_TO_WEISHAUPT.get(hvac_mode)
-        if modbus_value is None:
-            _LOGGER.warning("Unknown HVAC mode: %s", hvac_mode)
+        self._attr_preset_mode = preset_mode
+        self.async_write_ha_state()
+
+
+class WeishauptHotWaterClimate(CoordinatorEntity, ClimateEntity, MyEntity):
+    """Representation of Weishaupt hot water as a climate entity."""
+
+    _attr_temperature_unit = UnitOfTemperature.CELSIUS
+    _attr_hvac_modes = [HVACMode.HEAT]
+    _attr_preset_modes = [PRESET_NORMAL, PRESET_ECO]
+    _attr_supported_features = (
+        ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.PRESET_MODE
+    )
+
+    def __init__(
+        self,
+        config_entry: MyConfigEntry,
+        coordinator: MyCoordinator,
+        ww_items: dict[int, ModbusItem],
+    ) -> None:
+        """Initialize the hot water climate entity."""
+        CoordinatorEntity.__init__(self, coordinator)
+
+        # Current hot water temperature sensor (32102)
+        self._current_temp_item = ww_items.get(32102)
+
+        # Hot water temperature setpoints (42103, 42104)
+        self._normal_temp_item = ww_items.get(42103)
+        self._eco_temp_item = ww_items.get(42104)
+
+        # Use the normal temp item as the primary item for MyEntity initialization
+        if self._normal_temp_item:
+            MyEntity.__init__(self, config_entry, self._normal_temp_item, coordinator)
+
+        # Override unique ID and name for climate entity
+        self._attr_unique_id = f"{config_entry.data.get('prefix', 'weishaupt')}_climate_ww"
+        self._attr_translation_key = "climate_ww"
+        self._attr_name = "Warmwasser"
+
+        # Current preset mode
+        self._attr_preset_mode = PRESET_NORMAL
+
+        self._modbus_api: ModbusAPI = coordinator.modbus_api
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        self.async_write_ha_state()
+
+    @property
+    def current_temperature(self) -> float | None:
+        """Return the current hot water temperature."""
+        if self._current_temp_item and self._current_temp_item.state is not None:
+            return float(self._current_temp_item.state) / 10
+        return None
+
+    @property
+    def target_temperature(self) -> float | None:
+        """Return the target temperature."""
+        preset_item_map = {
+            PRESET_NORMAL: self._normal_temp_item,
+            PRESET_ECO: self._eco_temp_item,
+        }
+
+        item = preset_item_map.get(self._attr_preset_mode)
+        if item and item.state is not None:
+            return float(item.state) / 10
+        return None
+
+    @property
+    def hvac_mode(self) -> HVACMode:
+        """Return current HVAC mode (always HEAT for hot water)."""
+        return HVACMode.HEAT
+
+    @property
+    def min_temp(self) -> float:
+        """Return the minimum temperature."""
+        return 10.0
+
+    @property
+    def max_temp(self) -> float:
+        """Return the maximum temperature."""
+        return 65.0
+
+    @property
+    def target_temperature_step(self) -> float:
+        """Return the supported step of target temperature."""
+        return 0.5
+
+    async def async_set_temperature(self, **kwargs: Any) -> None:
+        """Set new target temperature."""
+        if (temperature := kwargs.get(ATTR_TEMPERATURE)) is None:
             return
+
+        preset_item_map = {
+            PRESET_NORMAL: self._normal_temp_item,
+            PRESET_ECO: self._eco_temp_item,
+        }
+
+        item = preset_item_map.get(self._attr_preset_mode)
+        if item is None:
+            _LOGGER.warning(
+                "Cannot set temperature: no item for preset %s", self._attr_preset_mode
+            )
+            return
+
+        # Convert to modbus value (multiply by 10)
+        modbus_value = int(temperature * 10)
 
         await self._modbus_api.connect()
-        mbo = ModbusObject(self._modbus_api, self._mode_item)
+        mbo = ModbusObject(self._modbus_api, item)
         await mbo.set_value(modbus_value)
 
         # Update the item state
-        self._mode_item.state = modbus_value
+        item.state = modbus_value
 
         # Request coordinator update
         await self.coordinator.async_request_refresh()
+
+    async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
+        """Set new HVAC mode (not supported for hot water)."""
+        # Hot water is always in HEAT mode
+        _LOGGER.debug("HVAC mode changes not supported for hot water")
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set new preset mode."""
@@ -267,21 +392,6 @@ class WeishauptClimate(CoordinatorEntity, ClimateEntity, MyEntity):
             return
 
         self._attr_preset_mode = preset_mode
-
-        # When changing preset, also update the operation mode
-        mode_map = {
-            PRESET_COMFORT: 1,  # Komfort
-            PRESET_NORMAL: 2,  # Normal
-            PRESET_ECO: 3,  # Absenkbetrieb
-        }
-
-        if self._mode_item is not None:
-            modbus_value = mode_map.get(preset_mode)
-            if modbus_value is not None:
-                await self._modbus_api.connect()
-                mbo = ModbusObject(self._modbus_api, self._mode_item)
-                await mbo.set_value(modbus_value)
-                self._mode_item.state = modbus_value
 
         # Request coordinator update
         await self.coordinator.async_request_refresh()
