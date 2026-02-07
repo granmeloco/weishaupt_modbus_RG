@@ -36,16 +36,19 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the climate platform."""
+    _LOGGER.warning("Climate platform setup started")
     coordinator = config_entry.runtime_data.coordinator
     entries: list[WeishauptClimate | WeishauptHotWaterClimate] = []
 
     # Get all modbus items for heating circuits
     modbus_items = coordinator.modbus_items
+    _LOGGER.warning("Total modbus items: %d", len(modbus_items))
 
     # Create climate entity for HZ (Heizkreis 1)
     hz_items = {
         item.address: item for item in modbus_items if item.device == DEVICES.HZ
     }
+    _LOGGER.warning("HZ items found: %d", len(hz_items))
     if hz_items:
         entries.append(
             WeishauptClimate(
@@ -101,6 +104,9 @@ async def async_setup_entry(
             )
         )
 
+    _LOGGER.warning("Adding %d climate entities", len(entries))
+    for entry in entries:
+        _LOGGER.warning("  - %s (unique_id: %s)", entry.name, entry.unique_id)
     async_add_entities(entries, update_before_add=True)
 
 
