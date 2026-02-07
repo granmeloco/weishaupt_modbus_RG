@@ -1,11 +1,13 @@
 {
   "domain": "weishaupt_modbus_rg",
   "name": "Weishaupt WBB (RG-Version)",
+  "after_dependencies": [],
   "codeowners": [
     "@granmeloco"
   ],
   "config_flow": true,
   "documentation": "https://github.com/granmeloco/weishaupt_modbus_RG/",
+  "integration_type": "device",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/granmeloco/weishaupt_modbus_RG/issues",
   "loggers": [
